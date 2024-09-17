@@ -2,13 +2,17 @@
 // Iniciar la sesión
 session_start();
 
-require_once '../../config/database.php'; // Asegúrate de que la ruta es correcta
+require_once '../../config/database.php'; // Asegúrate de que la ruta sea correcta
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require '../../vendor/autoload.php'; // Si estás usando Composer para instalar PHPMailer
 
 // Inicializar variables
 $error_message = '';
 $success_message = '';
 
-// Verificar si se ha proporcionado un token
+// Verificar si el token está presente en la URL
 if (isset($_GET['token'])) {
     $token = $_GET['token'];
 
@@ -16,7 +20,7 @@ if (isset($_GET['token'])) {
     $database = new Database();
     $db = $database->getConnection();
 
-    // Buscar el token en la base de datos
+    // Verificar si el token es válido y no ha expirado
     $query = "SELECT * FROM users WHERE reset_token = ? AND reset_token_expire > NOW()";
     $stmt = $db->prepare($query);
     $stmt->bind_param("s", $token);
@@ -24,33 +28,27 @@ if (isset($_GET['token'])) {
     $result = $stmt->get_result();
 
     if ($result->num_rows == 1) {
-        $row = $result->fetch_assoc();
-        $user_id = $row['id_user'];
+        $user = $result->fetch_assoc();
 
-        // Verificar si el formulario ha sido enviado
+        // Verificar si se envió el formulario para cambiar la contraseña
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $new_password = $_POST['new_password'];
-            $confirm_password = $_POST['confirm_password'];
-
-            // Validar las contraseñas
-            if (empty($new_password) || empty($confirm_password)) {
+            // Validar las contraseñas ingresadas
+            if (empty($_POST['password_user']) || empty($_POST['confirm_password'])) {
                 $error_message = "Ambos campos de contraseña son obligatorios.";
-            } elseif ($new_password !== $confirm_password) {
+            } elseif ($_POST['password_user'] !== $_POST['confirm_password']) {
                 $error_message = "Las contraseñas no coinciden.";
-            } elseif (strlen($new_password) < 6) {
+            } elseif (strlen($_POST['password_user']) < 6) {
                 $error_message = "La contraseña debe tener al menos 6 caracteres.";
             } else {
-                // Encriptar la nueva contraseña y actualizar la base de datos
-                $hashed_password = password_hash($new_password, PASSWORD_BCRYPT);
-
+                // Actualizar la contraseña en la base de datos
+                $new_password = password_hash($_POST['password_user'], PASSWORD_BCRYPT);
                 $query = "UPDATE users SET password_user = ?, reset_token = NULL, reset_token_expire = NULL WHERE id_user = ?";
                 $stmt = $db->prepare($query);
-                $stmt->bind_param("si", $hashed_password, $user_id);
-
+                $stmt->bind_param("si", $new_password, $user['id_user']);
                 if ($stmt->execute()) {
-                    $success_message = "Tu contraseña ha sido restablecida con éxito.";
+                    $success_message = "Tu contraseña ha sido actualizada correctamente.";
                 } else {
-                    $error_message = "Error al restablecer la contraseña. Inténtalo nuevamente.";
+                    $error_message = "Error al actualizar la contraseña. Por favor, inténtalo de nuevo.";
                 }
             }
         }
@@ -58,7 +56,7 @@ if (isset($_GET['token'])) {
         $error_message = "El enlace de restablecimiento es inválido o ha expirado.";
     }
 } else {
-    $error_message = "Token no válido.";
+    $error_message = "Token de restablecimiento faltante o inválido.";
 }
 ?>
 
@@ -68,29 +66,26 @@ if (isset($_GET['token'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../../public/assets/css/login.css">
     <title>Restablecer Contraseña</title>
+    <link rel="stylesheet" href="../../public/assets/css/reset_password.css">
 </head>
 
 <body>
-    <div class="login-container">
-        <!-- Mostrar el mensaje de error o éxito si existe -->
+    <div class="reset-container">
         <?php if (!empty($error_message)): ?>
-            <div class="error-message">
-                <?php echo $error_message; ?>
-            </div>
-        <?php elseif (!empty($success_message)): ?>
-            <div class="success-message">
-                <?php echo $success_message; ?>
-            </div>
+            <div class="error-message"><?php echo $error_message; ?></div>
         <?php endif; ?>
 
-        <?php if (empty($success_message)): ?>
+        <?php if (!empty($success_message)): ?>
+            <div class="success-message"><?php echo $success_message; ?></div>
+            <p><a href="login.php">Volver al inicio de sesión</a></p>
+        <?php else: ?>
+            <h2>Restablecer tu contraseña</h2>
             <form action="" method="POST">
-                <label for="new_password">Nueva contraseña:</label>
-                <input type="password" name="new_password" required>
+                <label for="password_user">Nueva Contraseña:</label>
+                <input type="password" name="password_user" required>
 
-                <label for="confirm_password">Confirmar nueva contraseña:</label>
+                <label for="confirm_password">Confirmar Contraseña:</label>
                 <input type="password" name="confirm_password" required>
 
                 <input type="submit" value="Restablecer Contraseña">
