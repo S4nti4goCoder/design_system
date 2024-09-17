@@ -71,3 +71,25 @@ input[type="submit"] {
 input[type="submit"]:hover {
   background-color: #45a049;
 }
+
+.success-message {
+  color: #28a745;
+  background-color: #d4edda;
+  padding: 10px;
+  border: 1px solid #c3e6cb;
+  border-radius: 5px;
+  margin-bottom: 15px;
+  text-align: center;
+  width: 100%;
+}
+
+.error-message {
+  color: #ff4d4d;
+  background-color: #ffe6e6;
+  padding: 10px;
+  border: 1px solid #ff4d4d;
+  border-radius: 5px;
+  margin-bottom: 15px;
+  text-align: center;
+  width: 100%;
+}

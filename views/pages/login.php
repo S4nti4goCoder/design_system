@@ -26,6 +26,13 @@ header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
 $error_message = ''; // Variable para almacenar el mensaje de error
+$success_message = ''; // Variable para almacenar el mensaje de éxito
+
+// Mostrar el mensaje de éxito si fue redirigido desde forgot_password.php
+if (isset($_SESSION['success_message'])) {
+    $success_message = $_SESSION['success_message'];
+    unset($_SESSION['success_message']); // Limpiar el mensaje después de mostrarlo
+}
 
 // Crear una instancia de la base de datos
 $database = new Database();
@@ -97,6 +104,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 <body>
     <div class="login-container">
+        <!-- Mostrar el mensaje de éxito si existe -->
+        <?php if (!empty($success_message)): ?>
+            <div class="success-message">
+                <?php echo $success_message; ?>
+            </div>
+        <?php endif; ?>
+
         <!-- Mostrar el mensaje de error si existe -->
         <?php if (!empty($error_message)): ?>
             <div class="error-message">
@@ -113,6 +127,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             <input type="submit" value="Iniciar Sesión">
         </form>
+
+        <!-- Agregar enlace "Olvidé mi contraseña" debajo del formulario -->
+        <p><a href="forgot_password.php">¿Olvidaste tu contraseña?</a></p>
     </div>
 </body>
 
