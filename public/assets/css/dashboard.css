@@ -1,0 +1,63 @@
+/* Estilos para ajustar el layout correctamente */
+body,
+html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+/* Contenedor principal con flexbox */
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Ajuste del contenido (sidebar y contenido principal) */
+.content-wrapper {
+  display: flex;
+  flex: 1;
+}
+
+/* Sidebar fijo a la izquierda */
+.sidebar {
+  width: 250px;
+  background-color: #333;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  position: fixed;
+  top: 60px;
+  /* Ajuste del header */
+  padding-top: 20px;
+}
+
+.sidebar a {
+  padding: 10px;
+  text-decoration: none;
+  color: white;
+}
+
+.sidebar a:hover {
+  background-color: #575757;
+}
+
+/* Contenido principal */
+.main-content {
+  margin-left: 250px; /* Espacio para el sidebar */
+  padding: 20px;
+  flex-grow: 1;
+  margin-top: 80px; /* Aumentar margen superior para que no quede debajo del header */
+}
+
+/* Ajuste del footer */
+footer {
+  background-color: #4caf50;
+  color: white;
+  padding: 10px;
+  text-align: center;
+  position: relative;
+  width: 100%;
+  bottom: 0;
+}

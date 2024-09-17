@@ -1,0 +1,38 @@
+/* Sidebar con altura total de la ventana */
+.sidebar {
+  height: 100vh; /* Ocupar toda la altura de la pantalla */
+  width: 250px;
+  position: fixed;
+  top: 60px; /* Espacio debajo del header */
+  left: 0;
+  background-color: #333;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  padding-top: 20px;
+  z-index: 999;
+}
+
+.sidebar ul {
+  list-style-type: none; /* Eliminar los puntos de la lista */
+  padding: 0; /* Eliminar el padding por defecto */
+  margin: 0; /* Eliminar el margen por defecto */
+}
+
+.sidebar ul li {
+  margin: 15px 0; /* Añadir margen entre los elementos de la lista */
+}
+
+.sidebar a {
+  padding: 10px 20px; /* Añadir padding horizontal para alinear el texto */
+  text-decoration: none;
+  color: white;
+  display: block;
+  font-size: 16px; /* Ajustar tamaño de la fuente */
+}
+
+.sidebar a:hover {
+  background-color: #575757; /* Cambiar el color al pasar el ratón */
+  border-radius: 4px; /* Bordes redondeados en hover */
+  transition: background-color 0.3s ease; /* Transición suave */
+}
